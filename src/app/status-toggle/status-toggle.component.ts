@@ -14,6 +14,6 @@ export class StatusToggleComponent {
 
   toggle(): void {
     this.status = !this.status;
-    this.statusChange.next(this.status);
+    this.statusChange.emit(this.status);
   }
 }
