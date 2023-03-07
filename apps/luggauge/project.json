@@ -1,0 +1,88 @@
+{
+  "name": "luggauge",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/luggauge/src",
+  "prefix": "flight-demo",
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:browser",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/luggauge",
+        "index": "apps/luggauge/src/index.html",
+        "main": "apps/luggauge/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/luggauge/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": ["apps/luggauge/src/favicon.ico", "apps/luggauge/src/assets"],
+        "styles": [
+          "node_modules/@angular-architects/paper-design/assets/css/bootstrap.css",
+          "node_modules/@angular-architects/paper-design/assets/scss/paper-dashboard.scss",
+          "apps/luggauge/src/styles.scss"
+        ],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "browserTarget": "luggauge:build:production"
+        },
+        "development": {
+          "browserTarget": "luggauge:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "browserTarget": "luggauge:build"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/luggauge/**/*.ts", "apps/luggauge/**/*.html"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/luggauge/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["domain:luggauge", "type:app"]
+}

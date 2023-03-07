@@ -1,0 +1,1 @@
+export * from './lib/luggauge-card/luggauge-card.component';
