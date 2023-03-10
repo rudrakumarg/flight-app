@@ -3,7 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FlightCardComponent } from '../flight-card/flight-card.component';
 import { CityPipe } from '@flight-demo/shared/ui-common';
-import { Flight, FlightService } from '@flight-demo/tickets/domain';
+import { Flight, selectFilteredFlightsWithParams, ticketActions, ticketsFeature } from '@flight-demo/tickets/domain';
+import { Store } from '@ngrx/store';
+import { first } from 'rxjs';
+//import { takeCoverage } from 'v8';
+
 
 @Component({
   selector: 'app-flight-search',
@@ -13,9 +17,13 @@ import { Flight, FlightService } from '@flight-demo/tickets/domain';
   imports: [CommonModule, FormsModule, CityPipe, FlightCardComponent],
 })
 export class FlightSearchComponent {
+
+  private store = inject(Store);
+
+  flights$ = this.store.select(selectFilteredFlightsWithParams([993]));
+
   from = 'London';
   to = 'Paris';
-  flights: Array<Flight> = [];
   selectedFlight: Flight | undefined;
 
   basket: Record<number, boolean> = {
@@ -23,7 +31,6 @@ export class FlightSearchComponent {
     5: true,
   };
 
-  private flightService = inject(FlightService);
 
   search(): void {
     if (!this.from || !this.to) {
@@ -33,17 +40,28 @@ export class FlightSearchComponent {
     // Reset properties
     this.selectedFlight = undefined;
 
-    this.flightService.find(this.from, this.to).subscribe({
-      next: (flights) => {
-        this.flights = flights;
-      },
-      error: (errResp) => {
-        console.error('Error loading flights', errResp);
-      },
-    });
+    this.store.dispatch(
+      ticketActions.loadFlights({from: this.from, to:this.to})
+    );
   }
 
   select(f: Flight): void {
     this.selectedFlight = { ...f };
+  }
+
+  delay(): void {
+    this.flights$.pipe(first()).subscribe((flights) => {
+      const oldFlight = flights[0];
+      const oldDate = new Date(oldFlight.date);
+
+      const newDate = new Date(oldDate.getTime() + 1000 * 60 * 5);
+
+      const newFlight = {
+        ...oldFlight,
+        date: newDate.toISOString(),
+      }
+
+      this.store.dispatch(ticketActions.updateFlight({flight: newFlight}));
+    })
   }
 }
